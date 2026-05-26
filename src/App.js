@@ -1,9 +1,12 @@
 import React, { useState, useEffect } from 'react';
 
+// ─── CONFIGURATION SUPABASE ────────────────────────────────────────────────
+// ⚠️ REMPLACE LES DEUX VALEURS CI-DESSOUS PAR LES TIENNES
 const SUPABASE_URL = 'https://kwzyyjewdpgeheykfmvf.supabase.co';
 const SUPABASE_KEY =
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt3enl5amV3ZHBnZWhleWtmbXZmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk1NjIwMzksImV4cCI6MjA5NTEzODAzOX0.FwdW0p-K1KQSDrT-OaaRvxjtz4z3Bv3fpH6FMt1cxkk'; // remplace par ta clé eyJ...
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt3enl5amV3ZHBnZWhleWtmbXZmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk1NjIwMzksImV4cCI6MjA5NTEzODAzOX0.FwdW0p-K1KQSDrT-OaaRvxjtz4z3Bv3fpH6FMt1cxkk'; // commence par eyJ...
 
+// ─── CLIENT SUPABASE LÉGER ─────────────────────────────────────────────────
 const db = {
   async query(table, method = 'GET', body = null, filters = '') {
     const res = await fetch(`${SUPABASE_URL}/rest/v1/${table}${filters}`, {
@@ -29,6 +32,7 @@ const db = {
   del: (t, f) => db.query(t, 'DELETE', null, f),
 };
 
+// ─── HELPERS ───────────────────────────────────────────────────────────────
 const fmt = (n) => Math.round(n).toLocaleString('fr-FR') + ' F';
 const fmtDate = (s) => new Date(s).toLocaleDateString('fr-FR');
 const fmtTime = (s) =>
@@ -58,6 +62,7 @@ const G = {
   amberLight: '#FAEEDA',
 };
 
+// ─── COMPOSANTS DE BASE ────────────────────────────────────────────────────
 function Spinner() {
   return (
     <div style={{ display: 'flex', justifyContent: 'center', padding: 40 }}>
@@ -76,7 +81,7 @@ function Spinner() {
   );
 }
 
-function Modal({ title, onClose, children, wide }) {
+function Modal({ title, onClose, children }) {
   return (
     <div
       style={{
@@ -95,7 +100,7 @@ function Modal({ title, onClose, children, wide }) {
           background: 'white',
           borderRadius: 16,
           width: '100%',
-          maxWidth: wide ? 700 : 440,
+          maxWidth: 440,
           maxHeight: '90vh',
           overflow: 'auto',
           boxShadow: '0 8px 40px rgba(0,0,0,0.18)',
@@ -130,6 +135,27 @@ function Modal({ title, onClose, children, wide }) {
   );
 }
 
+function Field({ label, children }) {
+  return (
+    <div style={{ marginBottom: 12 }}>
+      {label && (
+        <label
+          style={{
+            display: 'block',
+            fontSize: 12,
+            color: '#666',
+            marginBottom: 4,
+            fontWeight: 500,
+          }}
+        >
+          {label}
+        </label>
+      )}
+      {children}
+    </div>
+  );
+}
+
 const inputStyle = {
   width: '100%',
   padding: '9px 12px',
@@ -142,45 +168,19 @@ const inputStyle = {
 
 function Inp({ label, ...p }) {
   return (
-    <div style={{ marginBottom: 12 }}>
-      {label && (
-        <label
-          style={{
-            display: 'block',
-            fontSize: 12,
-            color: '#666',
-            marginBottom: 4,
-            fontWeight: 500,
-          }}
-        >
-          {label}
-        </label>
-      )}
+    <Field label={label}>
       <input style={inputStyle} {...p} />
-    </div>
+    </Field>
   );
 }
 
 function Sel({ label, children, ...p }) {
   return (
-    <div style={{ marginBottom: 12 }}>
-      {label && (
-        <label
-          style={{
-            display: 'block',
-            fontSize: 12,
-            color: '#666',
-            marginBottom: 4,
-            fontWeight: 500,
-          }}
-        >
-          {label}
-        </label>
-      )}
+    <Field label={label}>
       <select style={inputStyle} {...p}>
         {children}
       </select>
-    </div>
+    </Field>
   );
 }
 
@@ -194,13 +194,7 @@ function Btn({
   style: sx,
 }) {
   const bg =
-    color === 'green'
-      ? G.brand
-      : color === 'red'
-      ? G.danger
-      : color === 'amber'
-      ? G.amber
-      : '#f0f0f0';
+    color === 'green' ? G.brand : color === 'red' ? G.danger : '#f0f0f0';
   const col = color === 'gray' ? '#555' : '#fff';
   return (
     <button
@@ -231,9 +225,7 @@ function Badge({ children, color = 'green' }) {
       ? { bg: G.brandLight, text: G.brandDark }
       : color === 'red'
       ? { bg: G.dangerLight, text: G.danger }
-      : color === 'amber'
-      ? { bg: G.amberLight, text: G.amber }
-      : { bg: '#f0f0f0', text: '#555' };
+      : { bg: G.amberLight, text: G.amber };
   return (
     <span
       style={{
@@ -243,7 +235,6 @@ function Badge({ children, color = 'green' }) {
         fontWeight: 500,
         background: c.bg,
         color: c.text,
-        whiteSpace: 'nowrap',
       }}
     >
       {children}
@@ -251,6 +242,7 @@ function Badge({ children, color = 'green' }) {
   );
 }
 
+// ─── IMPRESSION REÇU ───────────────────────────────────────────────────────
 function printReceipt(
   boutique,
   items,
@@ -320,552 +312,7 @@ function printReceipt(
   }, 400);
 }
 
-// ─── ADMIN DASHBOARD ──────────────────────────────────────────────────────
-function AdminDashboard({ adminBoutique, onLogout }) {
-  const [boutiques, setBoutiques] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [detail, setDetail] = useState(null);
-  const [stats, setStats] = useState({});
-  const [search, setSearch] = useState('');
-
-  useEffect(() => {
-    loadBoutiques();
-  }, []);
-
-  async function loadBoutiques() {
-    setLoading(true);
-    try {
-      const rows = await db.get('boutiques', '?order=created_at.desc');
-      setBoutiques(rows || []);
-      // Charger stats ventes pour chaque boutique
-      const allVentes = await db.get('ventes', '?select=boutique_id,total');
-      const s = {};
-      (allVentes || []).forEach((v) => {
-        if (!s[v.boutique_id]) s[v.boutique_id] = { count: 0, total: 0 };
-        s[v.boutique_id].count++;
-        s[v.boutique_id].total += v.total;
-      });
-      setStats(s);
-    } catch (e) {
-      console.error(e);
-    }
-    setLoading(false);
-  }
-
-  async function toggleActif(b) {
-    await db.patch('boutiques', { actif: !b.actif }, `?id=eq.${b.id}`);
-    setBoutiques(
-      boutiques.map((x) => (x.id === b.id ? { ...x, actif: !x.actif } : x))
-    );
-  }
-
-  async function prolonger(b, jours) {
-    const newDate = new Date(b.date_expiration || new Date());
-    newDate.setDate(newDate.getDate() + jours);
-    const dateStr = newDate.toISOString().split('T')[0];
-    await db.patch(
-      'boutiques',
-      { date_expiration: dateStr, actif: true },
-      `?id=eq.${b.id}`
-    );
-    setBoutiques(
-      boutiques.map((x) =>
-        x.id === b.id ? { ...x, date_expiration: dateStr, actif: true } : x
-      )
-    );
-    alert(`✅ Abonnement prolongé de ${jours} jours !`);
-  }
-
-  async function supprimerBoutique(b) {
-    if (
-      !window.confirm(
-        `Supprimer définitivement "${b.nom}" et toutes ses données ?`
-      )
-    )
-      return;
-    await db.del('boutiques', `?id=eq.${b.id}`);
-    setBoutiques(boutiques.filter((x) => x.id !== b.id));
-  }
-
-  const filtered = boutiques
-    .filter(
-      (b) =>
-        b.nom?.toLowerCase().includes(search.toLowerCase()) ||
-        b.email?.toLowerCase().includes(search.toLowerCase())
-    )
-    .filter((b) => !b.is_admin);
-
-  const totalActifs = filtered.filter((b) => b.actif).length;
-  const totalExpires = filtered.filter(
-    (b) => b.date_expiration && new Date(b.date_expiration) < new Date()
-  ).length;
-  const totalCA = Object.values(stats).reduce((s, v) => s + v.total, 0);
-
-  return (
-    <div
-      style={{
-        minHeight: '100vh',
-        background: '#f7f8fa',
-        fontFamily: "'Segoe UI', system-ui, sans-serif",
-      }}
-    >
-      {/* Header */}
-      <div
-        style={{
-          background: '#1a1a2e',
-          padding: '14px 24px',
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-        }}
-      >
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          <div
-            style={{
-              width: 32,
-              height: 32,
-              background: G.brand,
-              borderRadius: 8,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              color: '#fff',
-              fontWeight: 700,
-              fontSize: 14,
-            }}
-          >
-            B
-          </div>
-          <div>
-            <div style={{ color: 'white', fontWeight: 700, fontSize: 14 }}>
-              BoutikPro Admin
-            </div>
-            <div style={{ color: '#aaa', fontSize: 11 }}>
-              Tableau de bord administrateur
-            </div>
-          </div>
-        </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          <span style={{ color: '#aaa', fontSize: 12 }}>
-            👤 {adminBoutique.nom}
-          </span>
-          <Btn small color="red" onClick={onLogout}>
-            Déconnexion
-          </Btn>
-        </div>
-      </div>
-
-      <div style={{ padding: 24 }}>
-        {/* Métriques */}
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))',
-            gap: 12,
-            marginBottom: 24,
-          }}
-        >
-          {[
-            {
-              label: 'Total boutiques',
-              val: filtered.length,
-              icon: '🏪',
-              color: G.brand,
-            },
-            {
-              label: 'Boutiques actives',
-              val: totalActifs,
-              icon: '✅',
-              color: G.brand,
-            },
-            {
-              label: 'Abonnements expirés',
-              val: totalExpires,
-              icon: '⚠️',
-              color: G.danger,
-            },
-            {
-              label: 'CA total généré',
-              val: fmt(totalCA),
-              icon: '💰',
-              color: '#185FA5',
-            },
-          ].map((m, i) => (
-            <div
-              key={i}
-              style={{
-                background: 'white',
-                borderRadius: 12,
-                padding: '14px 16px',
-                border: '1px solid #eee',
-              }}
-            >
-              <div style={{ fontSize: 20, marginBottom: 4 }}>{m.icon}</div>
-              <div style={{ fontSize: 20, fontWeight: 700, color: m.color }}>
-                {m.val}
-              </div>
-              <div style={{ fontSize: 12, color: '#888' }}>{m.label}</div>
-            </div>
-          ))}
-        </div>
-
-        {/* Barre de recherche */}
-        <div
-          style={{
-            display: 'flex',
-            gap: 10,
-            marginBottom: 16,
-            alignItems: 'center',
-          }}
-        >
-          <input
-            placeholder="Rechercher une boutique..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            style={{
-              flex: 1,
-              padding: '9px 12px',
-              border: '1px solid #eee',
-              borderRadius: 8,
-              fontSize: 13,
-              outline: 'none',
-            }}
-          />
-          <Btn small onClick={loadBoutiques}>
-            🔄 Actualiser
-          </Btn>
-        </div>
-
-        {/* Tableau clients */}
-        {loading ? (
-          <Spinner />
-        ) : (
-          <div
-            style={{
-              background: 'white',
-              borderRadius: 12,
-              border: '1px solid #eee',
-              overflow: 'hidden',
-            }}
-          >
-            <div
-              style={{
-                padding: '14px 16px',
-                borderBottom: '1px solid #eee',
-                fontWeight: 600,
-                fontSize: 14,
-              }}
-            >
-              📋 Clients ({filtered.length})
-            </div>
-            <div style={{ overflowX: 'auto' }}>
-              <table
-                style={{
-                  width: '100%',
-                  borderCollapse: 'collapse',
-                  fontSize: 13,
-                }}
-              >
-                <thead>
-                  <tr
-                    style={{
-                      borderBottom: '2px solid #f0f0f0',
-                      background: '#fafafa',
-                    }}
-                  >
-                    {[
-                      'Boutique',
-                      'Email',
-                      'Inscription',
-                      'Expiration',
-                      'Ventes',
-                      'CA',
-                      'Statut',
-                      'Actions',
-                    ].map((h) => (
-                      <th
-                        key={h}
-                        style={{
-                          textAlign: 'left',
-                          padding: '10px 12px',
-                          fontSize: 11,
-                          color: '#aaa',
-                          fontWeight: 600,
-                        }}
-                      >
-                        {h}
-                      </th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {filtered.map((b) => {
-                    const expire = b.date_expiration
-                      ? new Date(b.date_expiration) < new Date()
-                      : false;
-                    const bStats = stats[b.id] || { count: 0, total: 0 };
-                    return (
-                      <tr
-                        key={b.id}
-                        style={{ borderBottom: '1px solid #f8f8f8' }}
-                      >
-                        <td style={{ padding: '10px 12px', fontWeight: 500 }}>
-                          🏪 {b.nom}
-                        </td>
-                        <td
-                          style={{
-                            padding: '10px 12px',
-                            color: '#666',
-                            fontSize: 12,
-                          }}
-                        >
-                          {b.email}
-                        </td>
-                        <td
-                          style={{
-                            padding: '10px 12px',
-                            color: '#888',
-                            fontSize: 12,
-                          }}
-                        >
-                          {fmtDate(b.created_at)}
-                        </td>
-                        <td style={{ padding: '10px 12px', fontSize: 12 }}>
-                          <span
-                            style={{
-                              color: expire ? G.danger : G.brand,
-                              fontWeight: 500,
-                            }}
-                          >
-                            {b.date_expiration
-                              ? fmtDate(b.date_expiration)
-                              : '—'}
-                          </span>
-                        </td>
-                        <td style={{ padding: '10px 12px', fontWeight: 500 }}>
-                          {bStats.count}
-                        </td>
-                        <td
-                          style={{
-                            padding: '10px 12px',
-                            fontWeight: 500,
-                            color: G.brand,
-                          }}
-                        >
-                          {fmt(bStats.total)}
-                        </td>
-                        <td style={{ padding: '10px 12px' }}>
-                          {!b.actif ? (
-                            <Badge color="red">Suspendu</Badge>
-                          ) : expire ? (
-                            <Badge color="amber">Expiré</Badge>
-                          ) : (
-                            <Badge color="green">Actif</Badge>
-                          )}
-                        </td>
-                        <td style={{ padding: '10px 12px' }}>
-                          <div
-                            style={{
-                              display: 'flex',
-                              gap: 4,
-                              flexWrap: 'wrap',
-                            }}
-                          >
-                            <button
-                              onClick={() => setDetail(b)}
-                              style={{
-                                fontSize: 11,
-                                padding: '4px 8px',
-                                background: '#f0f0f0',
-                                border: 'none',
-                                borderRadius: 6,
-                                cursor: 'pointer',
-                                fontWeight: 500,
-                              }}
-                            >
-                              👁 Détails
-                            </button>
-                            <button
-                              onClick={() => toggleActif(b)}
-                              style={{
-                                fontSize: 11,
-                                padding: '4px 8px',
-                                background: b.actif
-                                  ? G.dangerLight
-                                  : G.brandLight,
-                                border: 'none',
-                                borderRadius: 6,
-                                cursor: 'pointer',
-                                fontWeight: 500,
-                                color: b.actif ? G.danger : G.brandDark,
-                              }}
-                            >
-                              {b.actif ? '🚫 Bloquer' : '✅ Activer'}
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-              {filtered.length === 0 && (
-                <div
-                  style={{
-                    textAlign: 'center',
-                    color: '#ccc',
-                    padding: '40px 0',
-                    fontSize: 13,
-                  }}
-                >
-                  Aucun client inscrit
-                </div>
-              )}
-            </div>
-          </div>
-        )}
-      </div>
-
-      {/* Modal détail client */}
-      {detail && (
-        <Modal
-          title={`Client : ${detail.nom}`}
-          onClose={() => setDetail(null)}
-          wide
-        >
-          <div
-            style={{
-              display: 'grid',
-              gridTemplateColumns: '1fr 1fr',
-              gap: 16,
-              marginBottom: 20,
-            }}
-          >
-            <div>
-              <div style={{ fontSize: 12, color: '#888', marginBottom: 4 }}>
-                Nom de la boutique
-              </div>
-              <div style={{ fontWeight: 600 }}>{detail.nom}</div>
-            </div>
-            <div>
-              <div style={{ fontSize: 12, color: '#888', marginBottom: 4 }}>
-                Email
-              </div>
-              <div style={{ fontWeight: 500 }}>{detail.email}</div>
-            </div>
-            <div>
-              <div style={{ fontSize: 12, color: '#888', marginBottom: 4 }}>
-                Téléphone
-              </div>
-              <div>{detail.tel || '—'}</div>
-            </div>
-            <div>
-              <div style={{ fontSize: 12, color: '#888', marginBottom: 4 }}>
-                Adresse
-              </div>
-              <div>{detail.adresse || '—'}</div>
-            </div>
-            <div>
-              <div style={{ fontSize: 12, color: '#888', marginBottom: 4 }}>
-                Inscription
-              </div>
-              <div>{fmtDate(detail.created_at)}</div>
-            </div>
-            <div>
-              <div style={{ fontSize: 12, color: '#888', marginBottom: 4 }}>
-                Expiration
-              </div>
-              <div
-                style={{
-                  color:
-                    detail.date_expiration &&
-                    new Date(detail.date_expiration) < new Date()
-                      ? G.danger
-                      : G.brand,
-                  fontWeight: 500,
-                }}
-              >
-                {detail.date_expiration ? fmtDate(detail.date_expiration) : '—'}
-              </div>
-            </div>
-            <div>
-              <div style={{ fontSize: 12, color: '#888', marginBottom: 4 }}>
-                Total ventes
-              </div>
-              <div style={{ fontWeight: 600, color: G.brand }}>
-                {fmt((stats[detail.id] || {}).total || 0)}
-              </div>
-            </div>
-            <div>
-              <div style={{ fontSize: 12, color: '#888', marginBottom: 4 }}>
-                Nombre de ventes
-              </div>
-              <div style={{ fontWeight: 600 }}>
-                {(stats[detail.id] || {}).count || 0}
-              </div>
-            </div>
-          </div>
-          <div style={{ borderTop: '1px solid #eee', paddingTop: 16 }}>
-            <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 10 }}>
-              Actions
-            </div>
-            <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-              <Btn
-                small
-                onClick={() => {
-                  prolonger(detail, 30);
-                  setDetail(null);
-                }}
-              >
-                +30 jours
-              </Btn>
-              <Btn
-                small
-                onClick={() => {
-                  prolonger(detail, 90);
-                  setDetail(null);
-                }}
-              >
-                +90 jours
-              </Btn>
-              <Btn
-                small
-                onClick={() => {
-                  prolonger(detail, 365);
-                  setDetail(null);
-                }}
-              >
-                +1 an
-              </Btn>
-              <Btn
-                small
-                color={detail.actif ? 'red' : 'green'}
-                onClick={() => {
-                  toggleActif(detail);
-                  setDetail({ ...detail, actif: !detail.actif });
-                }}
-              >
-                {detail.actif ? '🚫 Suspendre' : '✅ Activer'}
-              </Btn>
-              <Btn
-                small
-                color="red"
-                onClick={() => {
-                  supprimerBoutique(detail);
-                  setDetail(null);
-                }}
-              >
-                🗑 Supprimer
-              </Btn>
-            </div>
-          </div>
-        </Modal>
-      )}
-    </div>
-  );
-}
-
-// ─── LOGIN ────────────────────────────────────────────────────────────────
+// ─── PAGE LOGIN / INSCRIPTION ──────────────────────────────────────────────
 function LoginPage({ onLogin }) {
   const [mode, setMode] = useState('login');
   const [form, setForm] = useState({
@@ -898,13 +345,6 @@ function LoginPage({ onLogin }) {
           setLoading(false);
           return;
         }
-        if (!b.actif && !b.is_admin) {
-          setError(
-            'Compte suspendu. Contactez BoutikPro pour renouveler votre abonnement.'
-          );
-          setLoading(false);
-          return;
-        }
         localStorage.setItem('boutikpro_session', JSON.stringify(b));
         onLogin(b);
       } else {
@@ -929,7 +369,6 @@ function LoginPage({ onLogin }) {
           email: form.email,
           password_hash: btoa(form.password),
           plan: 'gratuit',
-          actif: true,
         });
         const b = rows[0];
         localStorage.setItem('boutikpro_session', JSON.stringify(b));
@@ -1054,7 +493,6 @@ function LoginPage({ onLogin }) {
         >
           {mode === 'login' ? (
             <>
-              {' '}
               Pas de compte ?{' '}
               <span
                 onClick={() => {
@@ -1086,7 +524,7 @@ function LoginPage({ onLogin }) {
   );
 }
 
-// ─── DASHBOARD BOUTIQUE ───────────────────────────────────────────────────
+// ─── DASHBOARD ────────────────────────────────────────────────────────────
 function Dashboard({ boutique, produits, ventes }) {
   const today = new Date().toDateString();
   const ventesAuj = ventes.filter(
@@ -1266,6 +704,7 @@ function Dashboard({ boutique, produits, ventes }) {
   );
 }
 
+// ─── PRODUITS ─────────────────────────────────────────────────────────────
 function Produits({ boutique, produits, setProduits }) {
   const [search, setSearch] = useState('');
   const [cat, setCat] = useState('Tout');
@@ -1291,7 +730,7 @@ function Produits({ boutique, produits, setProduits }) {
         const rows = await db.post('produits', {
           boutique_id: boutique.id,
           nom: form.nom,
-          categorie: form.categorie || 'Autre',
+          categorie: form.categorie || 'Tissu',
           prix: +form.prix,
           stock: +form.stock,
           stock_min: +form.stock_min || 5,
@@ -1374,7 +813,7 @@ function Produits({ boutique, produits, setProduits }) {
           onClick={() => {
             setForm({
               nom: '',
-              categorie: '',
+              categorie: 'Tissu',
               prix: '',
               stock: '',
               stock_min: '5',
@@ -1416,10 +855,7 @@ function Produits({ boutique, produits, setProduits }) {
           </thead>
           <tbody>
             {filtered.map((p) => {
-              const cc = CAT_COLORS[p.categorie] || {
-                bg: '#f0f0f0',
-                text: '#555',
-              };
+              const cc = CAT_COLORS[p.categorie] || CAT_COLORS.Autre;
               const sc =
                 p.stock <= 0
                   ? 'red'
@@ -1560,6 +996,7 @@ function Produits({ boutique, produits, setProduits }) {
   );
 }
 
+// ─── CAISSE ───────────────────────────────────────────────────────────────
 function Caisse({ boutique, produits, setProduits, ventes, setVentes }) {
   const [panier, setPanier] = useState([]);
   const [search, setSearch] = useState('');
@@ -1947,6 +1384,7 @@ function Caisse({ boutique, produits, setProduits, ventes, setVentes }) {
   );
 }
 
+// ─── VENTES ───────────────────────────────────────────────────────────────
 function Ventes({ boutique, ventes }) {
   const [detail, setDetail] = useState(null);
   const total = ventes.reduce((s, v) => s + v.total, 0);
@@ -2089,6 +1527,7 @@ function Ventes({ boutique, ventes }) {
   );
 }
 
+// ─── STATS ────────────────────────────────────────────────────────────────
 function Stats({ ventes, produits }) {
   const byDay = {};
   ventes.forEach((v) => {
@@ -2183,7 +1622,7 @@ function Stats({ ventes, produits }) {
                   }}
                 >
                   <span>
-                    {CAT_ICONS[cat] || '📦'} {cat}
+                    {CAT_ICONS[cat]} {cat}
                   </span>
                   <span style={{ fontWeight: 600 }}>{fmt(v)}</span>
                 </div>
@@ -2241,6 +1680,7 @@ function Stats({ ventes, produits }) {
   );
 }
 
+// ─── PARAMÈTRES ───────────────────────────────────────────────────────────
 function Parametres({ boutique, setBoutique, onLogout }) {
   const [form, setForm] = useState({
     nom: boutique.nom,
@@ -2307,6 +1747,7 @@ function Parametres({ boutique, setBoutique, onLogout }) {
   );
 }
 
+// ─── APP PRINCIPALE ───────────────────────────────────────────────────────
 const NAVS = [
   { id: 'dashboard', icon: '🏠', label: 'Accueil' },
   { id: 'caisse', icon: '💳', label: 'Caisse' },
@@ -2328,11 +1769,48 @@ export default function App() {
     const s = localStorage.getItem('boutikpro_session');
     if (s) {
       const b = JSON.parse(s);
-      setBoutique(b);
-      loadData(b.id);
+      db.get('boutiques', `?id=eq.${b.id}&select=actif,is_admin`)
+        .then((rows) => {
+          if (
+            !rows ||
+            rows.length === 0 ||
+            (!rows[0].actif && !rows[0].is_admin)
+          ) {
+            localStorage.removeItem('boutikpro_session');
+            setLoading(false);
+          } else {
+            setBoutique(b);
+            loadData(b.id);
+          }
+        })
+        .catch(() => {
+          setBoutique(b);
+          loadData(b.id);
+        });
     } else setLoading(false);
   }, []);
-
+  useEffect(() => {
+    if (!boutique) return;
+    const interval = setInterval(async () => {
+      try {
+        const rows = await db.get(
+          'boutiques',
+          `?id=eq.${boutique.id}&select=actif,is_admin`
+        );
+        if (
+          !rows ||
+          rows.length === 0 ||
+          (!rows[0].actif && !rows[0].is_admin)
+        ) {
+          localStorage.removeItem('boutikpro_session');
+          setBoutique(null);
+          setProduits([]);
+          setVentes([]);
+        }
+      } catch (e) {}
+    }, 30000); // vérifie toutes les 30 secondes
+    return () => clearInterval(interval);
+  }, [boutique]);
   async function loadData(id) {
     setLoading(true);
     try {
@@ -2376,10 +1854,6 @@ export default function App() {
         <Spinner />
       </div>
     );
-
-  // ─── ADMIN ───
-  if (boutique.is_admin)
-    return <AdminDashboard adminBoutique={boutique} onLogout={handleLogout} />;
 
   const props = {
     boutique,
@@ -2450,7 +1924,7 @@ export default function App() {
           {sideOpen && (
             <div>
               <div style={{ fontWeight: 700, fontSize: 14 }}>BoutikPro</div>
-              <div style={{ fontSize: 10, color: '#aaa' }}>SaaS v3.0</div>
+              <div style={{ fontSize: 10, color: '#aaa' }}>SaaS v2.0</div>
             </div>
           )}
         </div>
