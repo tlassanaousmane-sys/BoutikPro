@@ -261,7 +261,7 @@ function AdminDashboard({ adminBoutique, onLogout }) {
                             : <Badge color="green">Actif</Badge>}
                         </td>
                         <td style={{ padding: '10px 12px' }}>
-                          <div style={{ display: 'flex', gap: 4', flexWrap: 'wrap' }}>
+                          <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
                             <button onClick={() => setDetail(b)}
                               style={{ fontSize: 11, padding: '4px 8px', background: '#f0f0f0', border: 'none', borderRadius: 6, cursor: 'pointer', fontWeight: 500 }}>
                               👁 Détails
