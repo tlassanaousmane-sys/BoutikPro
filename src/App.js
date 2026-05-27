@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 
 const SUPABASE_URL = 'https://kwzyyjewdpgeheykfmvf.supabase.co';
-const SUPABASE_KEY = 'COLLE_TA_CLÉ_ANON_ICI'; // remplace par ta clé eyJ...
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt3enl5amV3ZHBnZWhleWtmbXZmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk1NjIwMzksImV4cCI6MjA5NTEzODAzOX0.FwdW0p-K1KQSDrT-OaaRvxjtz4z3Bv3fpH6FMt1cxkk'; // remplace par ta clé eyJ...
 
 const db = {
   async query(table, method = 'GET', body = null, filters = '') {
@@ -261,7 +261,7 @@ function AdminDashboard({ adminBoutique, onLogout }) {
                             : <Badge color="green">Actif</Badge>}
                         </td>
                         <td style={{ padding: '10px 12px' }}>
-                          <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
+                          <div style={{ display: 'flex', gap: 4n, flexWrap: 'wrap' }}>
                             <button onClick={() => setDetail(b)}
                               style={{ fontSize: 11, padding: '4px 8px', background: '#f0f0f0', border: 'none', borderRadius: 6, cursor: 'pointer', fontWeight: 500 }}>
                               👁 Détails
