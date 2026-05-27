@@ -834,7 +834,21 @@ export default function App() {
     if (s) { const b = JSON.parse(s); setBoutique(b); loadData(b.id); }
     else setLoading(false);
   }, []);
-
+  useEffect(() => {
+    if (!boutique) return;
+    const interval = setInterval(async () => {
+      try {
+        const rows = await db.get('boutiques', `?id=eq.${boutique.id}&select=actif,is_admin`);
+        if (!rows || rows.length === 0 || (!rows[0].actif && !rows[0].is_admin)) {
+          localStorage.removeItem('boutikpro_session');
+          setBoutique(null);
+          setProduits([]);
+          setVentes([]);
+        }
+      } catch (e) {}
+    }, 30000);
+    return () => clearInterval(interval);
+  }, [boutique]);
   async function loadData(id) {
     setLoading(true);
     try {
