@@ -846,7 +846,7 @@ export default function App() {
           setVentes([]);
         }
       } catch (e) {}
-    }, 30000);
+    }, 5000);
     return () => clearInterval(interval);
   }, [boutique]);
   async function loadData(id) {
