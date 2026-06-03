@@ -402,6 +402,7 @@ function LoginPage({ onLogin }) {
 
 // ─── DASHBOARD BOUTIQUE ───────────────────────────────────────────────────
 function Dashboard({ boutique, produits, ventes }) {
+  const [showAmounts, setShowAmounts] = useState(true);
   const today = new Date().toDateString();
   const ventesAuj = ventes.filter(v => new Date(v.created_at).toDateString() === today);
   const caAuj = ventesAuj.reduce((s, v) => s + v.total, 0);
@@ -421,13 +422,17 @@ function Dashboard({ boutique, produits, ventes }) {
     <div>
       <div style={{ marginBottom: 20 }}>
         <h2 style={{ fontSize: 18, fontWeight: 600, margin: 0 }}>Bonjour, {boutique.nom} 👋</h2>
+        <button onClick={() => setShowAmounts(!showAmounts)}
+        style={{ float: 'right', background: 'none', border: 'none', fontSize: 20, cursor: 'pointer' }}>
+        {showAmounts ? '👁' : '👁‍🗨'}
+        </button>
         <p style={{ fontSize: 13, color: '#888', margin: '4px 0 0' }}>{new Date().toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}</p>
       </div>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: 12, marginBottom: 24 }}>
         {metrics.map((m, i) => (
           <div key={i} style={{ background: '#fafafa', borderRadius: 12, padding: '14px 16px', border: '1px solid #eee' }}>
             <div style={{ fontSize: 12, color: '#888', marginBottom: 4 }}>{m.label}</div>
-            <div style={{ fontSize: 20, fontWeight: 700, color: m.color }}>{m.val}</div>
+            <div style={{ fontSize: 20, fontWeight: 700, color: m.color }}>{showAmounts ? m.val : '••••'}</div>
             <div style={{ fontSize: 11, color: '#aaa', marginTop: 2 }}>{m.sub}</div>
           </div>
         ))}
@@ -846,7 +851,7 @@ export default function App() {
           setVentes([]);
         }
       } catch (e) {}
-    }, 5000);
+    }, 30000);
     return () => clearInterval(interval);
   }, [boutique]);
   async function loadData(id) {
